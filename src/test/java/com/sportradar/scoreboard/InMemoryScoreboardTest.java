@@ -197,6 +197,24 @@ class InMemoryScoreboardTest {
                     .isInstanceOf(MatchNotFoundException.class);
         }
 
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" "})
+        void rejectsMissingTeamName(String team) {
+            scoreboard.startMatch("Mexico", "Canada");
+
+            assertThatThrownBy(() -> scoreboard.updateScore(team, "Canada", 1, 0))
+                    .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> scoreboard.updateScore("Mexico", team, 1, 0))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        void validatesArgumentsBeforeLookingUpMatch() {
+            assertThatThrownBy(() -> scoreboard.updateScore("Spain", "Brazil", -1, 0))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
         @Test
         void matchesTeamNamesIgnoringCaseAndSurroundingWhitespace() {
             scoreboard.startMatch("Poland", "Spain");
@@ -240,6 +258,18 @@ class InMemoryScoreboardTest {
 
             assertThatThrownBy(() -> scoreboard.finishMatch("Spain", "Brazil"))
                     .isInstanceOf(MatchNotFoundException.class);
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" "})
+        void rejectsMissingTeamName(String team) {
+            scoreboard.startMatch("Mexico", "Canada");
+
+            assertThatThrownBy(() -> scoreboard.finishMatch(team, "Canada"))
+                    .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> scoreboard.finishMatch("Mexico", team))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test

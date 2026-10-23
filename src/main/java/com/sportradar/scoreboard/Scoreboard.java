@@ -34,7 +34,8 @@ public interface Scoreboard {
 
     /**
      * Replaces the score of a match in progress with the given absolute score. A lower score than
-     * the current one is accepted, e.g. to apply a correction.
+     * the current one is accepted, e.g. to apply a correction. Arguments are validated before the
+     * match is looked up, so invalid input is reported as such even for an unknown match.
      *
      * @param homeTeam  home team of the match
      * @param awayTeam  away team of the match

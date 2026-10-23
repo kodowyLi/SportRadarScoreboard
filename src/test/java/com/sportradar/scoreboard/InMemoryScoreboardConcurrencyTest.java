@@ -76,6 +76,8 @@ class InMemoryScoreboardConcurrencyTest {
                 if (thread < readers) {
                     while (writersRunning.getCount() > 0) {
                         assertNoTeamPlaysTwice(scoreboard.getSummary());
+                        // reader i checks the match of writer thread readers + i
+                        assertFoundMatchIsConsistent(scoreboard, readers + thread);
                     }
                 } else {
                     try {
@@ -101,6 +103,13 @@ class InMemoryScoreboardConcurrencyTest {
             scoreboard.updateScore(home, away, i % 10, i % 7);
             scoreboard.finishMatch(home, away);
         }
+    }
+
+    private static void assertFoundMatchIsConsistent(Scoreboard scoreboard, int writer) {
+        scoreboard.findMatchByTeam("Away " + writer).ifPresent(match -> {
+            assertThat(match.homeTeam()).isEqualTo("Home " + writer);
+            assertThat(match.awayTeam()).isEqualTo("Away " + writer);
+        });
     }
 
     private static void assertNoTeamPlaysTwice(List<Match> summary) {
