@@ -40,6 +40,17 @@ public interface Scoreboard {
     void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore);
 
     /**
+     * Finishes a match in progress and removes it from the scoreboard. The same pairing can be
+     * started again afterwards.
+     *
+     * @param homeTeam home team of the match
+     * @param awayTeam away team of the match
+     * @throws IllegalArgumentException if a team name is null or blank
+     * @throws MatchNotFoundException   if no match with this home/away pairing is in progress
+     */
+    void finishMatch(String homeTeam, String awayTeam);
+
+    /**
      * Returns the matches currently in progress.
      *
      * @return unmodifiable list of match snapshots

@@ -51,6 +51,15 @@ public final class InMemoryScoreboard implements Scoreboard {
     }
 
     @Override
+    public void finishMatch(String homeTeam, String awayTeam) {
+        TeamName home = TeamName.of(homeTeam);
+        TeamName away = TeamName.of(awayTeam);
+        if (matches.remove(new MatchKey(home.key(), away.key())) == null) {
+            throw new MatchNotFoundException(home.display(), away.display());
+        }
+    }
+
+    @Override
     public List<Match> getSummary() {
         return List.copyOf(matches.values());
     }

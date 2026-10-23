@@ -52,15 +52,17 @@ Implementation:
 
 ## Step 4: Finish a match (D5, D12, D13)
 Tests first:
-- [ ] A finished match disappears from the summary
-- [ ] Unknown or already finished match → `MatchNotFoundException`
-- [ ] Updating a finished match fails
-- [ ] The same pairing can be started again after it finishes
-- [ ] Home and away are kept apart: if Poland–Spain is live, `finishMatch("Spain", "Poland")` → `MatchNotFoundException`, and the live match stays on the board
+- [x] A finished match disappears from the summary
+- [x] Unknown or already finished match → `MatchNotFoundException`
+- [x] Updating a finished match fails
+- [x] The same pairing can be started again after it finishes
+- [x] Both teams are free after finishing: Poland–Spain finished, then Poland–Mexico and Spain–Germany can start
+- [x] `updateScore` and `finishMatch` match team names ignoring case and surrounding whitespace (`" poland"`, `"SPAIN "`)
+- [x] Home and away are kept apart: if Poland–Spain is live, `finishMatch("Spain", "Poland")` → `MatchNotFoundException`, and the live match stays on the board
 
 Implementation:
-- [ ] `finishMatch(home, away)`
-- [ ] Commit: *Add finishing a match*
+- [x] `finishMatch(home, away)`
+- [x] Commit: *Add finishing a match*
 
 ## Step 5: Summary ordering (D15, D16)
 Tests first:

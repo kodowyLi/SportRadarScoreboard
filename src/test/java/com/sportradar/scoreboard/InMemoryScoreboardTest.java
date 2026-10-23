@@ -172,6 +172,16 @@ class InMemoryScoreboardTest {
         }
 
         @Test
+        void matchesTeamNamesIgnoringCaseAndSurroundingWhitespace() {
+            scoreboard.startMatch("Poland", "Spain");
+
+            scoreboard.updateScore(" poland", "SPAIN ", 2, 1);
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Poland", "Spain", 2, 1));
+        }
+
+        @Test
         void rejectsSwappedTeams() {
             scoreboard.startMatch("Poland", "Spain");
             scoreboard.updateScore("Poland", "Spain", 2, 1);
@@ -181,6 +191,94 @@ class InMemoryScoreboardTest {
 
             assertThat(scoreboard.getSummary())
                     .containsExactly(new Match("Poland", "Spain", 2, 1));
+        }
+    }
+
+    @Nested
+    class FinishMatch {
+
+        @Test
+        void removesMatchFromSummary() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.startMatch("Spain", "Brazil");
+
+            scoreboard.finishMatch("Mexico", "Canada");
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Spain", "Brazil", 0, 0));
+        }
+
+        @Test
+        void rejectsUnknownMatch() {
+            scoreboard.startMatch("Mexico", "Canada");
+
+            assertThatThrownBy(() -> scoreboard.finishMatch("Spain", "Brazil"))
+                    .isInstanceOf(MatchNotFoundException.class);
+        }
+
+        @Test
+        void rejectsAlreadyFinishedMatch() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.finishMatch("Mexico", "Canada");
+
+            assertThatThrownBy(() -> scoreboard.finishMatch("Mexico", "Canada"))
+                    .isInstanceOf(MatchNotFoundException.class);
+        }
+
+        @Test
+        void finishedMatchCannotBeUpdated() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.finishMatch("Mexico", "Canada");
+
+            assertThatThrownBy(() -> scoreboard.updateScore("Mexico", "Canada", 1, 0))
+                    .isInstanceOf(MatchNotFoundException.class);
+        }
+
+        @Test
+        void samePairingCanBeStartedAgainAfterFinishing() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.updateScore("Mexico", "Canada", 2, 1);
+            scoreboard.finishMatch("Mexico", "Canada");
+
+            Match rematch = scoreboard.startMatch("Mexico", "Canada");
+
+            assertThat(rematch).isEqualTo(new Match("Mexico", "Canada", 0, 0));
+            assertThat(scoreboard.getSummary()).containsExactly(rematch);
+        }
+
+        @Test
+        void teamsCanPlayOtherMatchesAfterFinishing() {
+            scoreboard.startMatch("Poland", "Spain");
+            scoreboard.finishMatch("Poland", "Spain");
+
+            scoreboard.startMatch("Poland", "Mexico");
+            scoreboard.startMatch("Spain", "Germany");
+
+            assertThat(scoreboard.getSummary()).containsExactlyInAnyOrder(
+                    new Match("Poland", "Mexico", 0, 0),
+                    new Match("Spain", "Germany", 0, 0));
+        }
+
+        @Test
+        void matchesTeamNamesIgnoringCaseAndSurroundingWhitespace() {
+            scoreboard.startMatch("Poland", "Spain");
+            scoreboard.startMatch("Mexico", "Canada");
+
+            scoreboard.finishMatch(" poland", "SPAIN ");
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Mexico", "Canada", 0, 0));
+        }
+
+        @Test
+        void rejectsSwappedTeams() {
+            scoreboard.startMatch("Poland", "Spain");
+
+            assertThatThrownBy(() -> scoreboard.finishMatch("Spain", "Poland"))
+                    .isInstanceOf(MatchNotFoundException.class);
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Poland", "Spain", 0, 0));
         }
     }
 }
