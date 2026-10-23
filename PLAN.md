@@ -84,11 +84,11 @@ Implementation:
 - [x] Commit: *Make Scoreboard thread-safe*
 
 ## Step 7: README.md
-- [ ] Usage example
-- [ ] Assumptions, reasoning and trade-offs (summarised from DECISIONS.md, with a link)
-- [ ] Thread-safety upgrade path
-- [ ] How to build and test
-- [ ] Commit: *Add README*
+- [x] Usage example
+- [x] Assumptions, reasoning and trade-offs (summarised from DECISIONS.md, with a link)
+- [x] Thread-safety upgrade path
+- [x] How to build and test
+- [x] Commit: *Add README*
 
 ## Step 8: Extra feature, `findMatchByTeam` (D22), in its own commit
 Tests first:
