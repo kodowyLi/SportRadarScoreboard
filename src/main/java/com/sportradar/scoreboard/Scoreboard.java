@@ -10,9 +10,11 @@ import java.util.Optional;
 /**
  * Live football scoreboard that keeps track of matches in progress.
  * <p>
- * Team names are normalised: surrounding whitespace is removed, any whitespace inside a name
- * becomes a single space, and names are compared ignoring case. So {@code "Costa Rica"},
- * {@code " costa  RICA "} and a name using a no-break space all refer to the same team.
+ * Team names are normalised: invisible formatting characters (such as zero-width spaces) are
+ * removed, surrounding whitespace is removed, any whitespace inside a name becomes a single space,
+ * the name is put into Unicode NFC form, and names are compared ignoring case. So
+ * {@code "Costa Rica"}, {@code " costa  RICA "} and a name using a no-break space all refer to the
+ * same team. Names containing control characters are rejected.
  * A team can take part in at most one match in progress at a time.
  */
 public interface Scoreboard {
@@ -23,7 +25,8 @@ public interface Scoreboard {
      * @param homeTeam home team name
      * @param awayTeam away team name
      * @return snapshot of the started match
-     * @throws IllegalArgumentException     if a team name is null or blank, or both names refer to the same team
+     * @throws IllegalArgumentException     if a team name is null, blank or contains control characters,
+     *                                      or both names refer to the same team
      * @throws MatchAlreadyStartedException if the same home/away pairing is already in progress
      * @throws TeamAlreadyPlayingException  if either team is already playing in another match
      */
@@ -37,7 +40,8 @@ public interface Scoreboard {
      * @param awayTeam  away team of the match
      * @param homeScore new home team score
      * @param awayScore new away team score
-     * @throws IllegalArgumentException if a team name is null or blank, or a score is negative
+     * @throws IllegalArgumentException if a team name is null, blank or contains control characters,
+     *                                  or a score is negative
      * @throws MatchNotFoundException   if no match with this home/away pairing is in progress
      */
     void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore);
@@ -48,7 +52,7 @@ public interface Scoreboard {
      *
      * @param homeTeam home team of the match
      * @param awayTeam away team of the match
-     * @throws IllegalArgumentException if a team name is null or blank
+     * @throws IllegalArgumentException if a team name is null, blank or contains control characters
      * @throws MatchNotFoundException   if no match with this home/away pairing is in progress
      */
     void finishMatch(String homeTeam, String awayTeam);
@@ -68,7 +72,7 @@ public interface Scoreboard {
      *
      * @param team team name
      * @return snapshot of the team's match in progress, or empty if the team is not playing
-     * @throws IllegalArgumentException if the team name is null or blank
+     * @throws IllegalArgumentException if the team name is null, blank or contains control characters
      */
     Optional<Match> findMatchByTeam(String team);
 }

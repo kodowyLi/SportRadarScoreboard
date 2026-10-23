@@ -22,6 +22,8 @@ Tests first:
 - [x] A team playing itself → `IllegalArgumentException`
 - [x] Names are stripped of surrounding (including Unicode) whitespace and compared ignoring case
 - [x] Whitespace inside a name collapses to a single space: "Costa\u00A0Rica" and "Costa  Rica" are the same team, shown as "Costa Rica"
+- [x] Invisible formatting characters are removed ("Spain\u200B" is Spain) and names are NFC-normalised (composed and decomposed "Curacao" cedilla are the same team)
+- [x] Names with control characters, or with no visible characters, → `IllegalArgumentException`
 - [x] Starting the same pairing twice → `MatchAlreadyStartedException`
 - [x] A team that is already playing → `TeamAlreadyPlayingException` (e.g. Poland–Brazil is live, so Spain–Poland is rejected)
 - [x] Match keys don't collide: "AB" vs "CDE" and "ABC" vs "DE" are separate matches and both can start

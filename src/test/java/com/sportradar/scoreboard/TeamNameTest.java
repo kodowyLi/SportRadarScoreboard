@@ -46,6 +46,35 @@ class TeamNameTest {
     }
 
     @Test
+    void composedAndDecomposedAccentsAreSameTeam() {
+        TeamName composed = TeamName.of("Cura\u00E7ao");
+        TeamName decomposed = TeamName.of("Curac\u0327ao");
+
+        assertThat(decomposed.sameTeamAs(composed)).isTrue();
+        assertThat(decomposed.display()).isEqualTo("Cura\u00E7ao");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"Spain\u200B", "\uFEFFSpain", "Sp\u00ADain", "\u200ESpain\u200D"})
+    void removesInvisibleFormatCharacters(String rawName) {
+        TeamName team = TeamName.of(rawName);
+
+        assertThat(team.display()).isEqualTo("Spain");
+    }
+
+    @Test
+    void removesFormatCharacterBetweenWords() {
+        assertThat(TeamName.of("Costa\u200B Rica").display()).isEqualTo("Costa Rica");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"\u0000", "Spa\u0000in", "Spain\u0007", "\u007FSpain", "Spain\u0085"})
+    void rejectsControlCharacters(String rawName) {
+        assertThatThrownBy(() -> TeamName.of(rawName))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void keepsOriginalCaseForDisplay() {
         TeamName team = TeamName.of("SPAIN");
 
@@ -69,7 +98,7 @@ class TeamNameTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {" ", "\t", "\u2003", "\u3000 \n", "\u00A0", "\u2007\u202F"})
+    @ValueSource(strings = {" ", "\t", "\u2003", "\u3000 \n", "\u00A0", "\u2007\u202F", "\u200B", "\uFEFF \u200D"})
     void rejectsNullAndBlankNames(String rawName) {
         assertThatThrownBy(() -> TeamName.of(rawName))
                 .isInstanceOf(IllegalArgumentException.class);

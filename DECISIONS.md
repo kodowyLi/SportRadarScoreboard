@@ -31,7 +31,7 @@ A team cannot physically play two matches at once.
 - C. No validation
 
 Decision: B
-Prevents "Spain" and "spain " being treated as different teams. Whitespace is normalised, not just trimmed: any run of whitespace, including Unicode and no-break spaces, becomes a single space and is stripped at the ends, so "Costa\u00A0Rica" and "Costa  Rica" are both "Costa Rica".
+Prevents "Spain" and "spain " being treated as different teams. Whitespace is normalised, not just trimmed: any run of whitespace, including Unicode and no-break spaces, becomes a single space and is stripped at the ends, so "Costa\u00A0Rica" and "Costa  Rica" are both "Costa Rica". Invisible formatting characters (zero-width spaces, soft hyphens, BOMs) are removed and names are put into Unicode NFC form, so differently encoded accents are the same team; names with control characters are rejected.
 
 ### D5. Can the same pairing be started again after it has finished?
 - A. Yes

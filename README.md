@@ -78,7 +78,7 @@ The task leaves several questions open on purpose. Each one, with the options co
 - **A new match starts at 0–0.** Scores come in through updates, as in the example.
 - **A match is identified by its home/away pair.** Home and away are not interchangeable: Spain–Poland does not find Poland–Spain.
 - **A team plays at most one match at a time.** Starting a match for a team that is already playing is rejected, as is starting the same pairing twice.
-- **Team names are normalised.** Surrounding whitespace is stripped, any whitespace inside a name becomes a single space (including Unicode and no-break spaces), and comparison ignores case. So `" spain"` and `"SPAIN "` are the same team, and so are `"Costa\u00A0Rica"` and `"Costa  Rica"`. The spelling used when the match was started is the one shown.
+- **Team names are normalised.** Surrounding whitespace is stripped, any whitespace inside a name becomes a single space (including Unicode and no-break spaces), and comparison ignores case. So `" spain"` and `"SPAIN "` are the same team, and so are `"Costa\u00A0Rica"` and `"Costa  Rica"`. Invisible formatting characters (zero-width spaces, soft hyphens) are removed and names are put into Unicode NFC form, so an accent typed as one character or as a letter plus a combining mark is the same team. Names containing control characters are rejected. The spelling used when the match was started is the one shown.
 - **Scores are absolute, not increments.** This matches "updated with these scores" and makes corrections natural.
 - **Scores may go down** (VAR decisions, feed corrections), **but never below zero.**
 - **Finished matches are removed.** This is a live scoreboard; history is out of scope. Both teams are free to play again, including a rematch.
@@ -99,6 +99,7 @@ The task leaves several questions open on purpose. Each one, with the options co
 - **Fail-fast exceptions vs. lenient API.** Rejecting unknown or duplicate operations surfaces caller bugs early, at the cost of callers having to handle exceptions.
 - **Team pair as identifier vs. match ID.** The API is simple and needs no ID bookkeeping, but it relies on the "one match per team" rule and requires callers to pass home and away in the right order.
 - **Case-insensitive names.** Names are lower-cased with `Locale.ROOT`. This covers the usual cases but is not full Unicode case folding (e.g. `"ß"` and `"SS"` are different teams).
+- **Removing invisible formatting characters.** This stops invisible duplicates such as `"Spain\u200B"`, but the same character class is used by some emoji: a name containing an emoji built with zero-width joiners, or a subdivision flag such as England's, loses those joining characters.
 - **No history.** Removing finished matches keeps the model small, but nothing can be queried about a match once it is finished.
 
 ## Thread safety

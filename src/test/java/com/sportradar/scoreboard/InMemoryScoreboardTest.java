@@ -107,6 +107,22 @@ class InMemoryScoreboardTest {
         }
 
         @Test
+        void treatsComposedAndDecomposedAccentsAsSameTeam() {
+            scoreboard.startMatch("Cura\u00E7ao", "Mexico");
+
+            assertThatThrownBy(() -> scoreboard.startMatch("Curac\u0327ao", "Canada"))
+                    .isInstanceOf(TeamAlreadyPlayingException.class);
+        }
+
+        @Test
+        void treatsNameWithZeroWidthSpaceAsSameTeam() {
+            scoreboard.startMatch("Spain", "Brazil");
+
+            assertThatThrownBy(() -> scoreboard.startMatch("Spain\u200B", "Germany"))
+                    .isInstanceOf(TeamAlreadyPlayingException.class);
+        }
+
+        @Test
         void rejectsReversedPairingWhileInProgress() {
             scoreboard.startMatch("Spain", "Brazil");
 
