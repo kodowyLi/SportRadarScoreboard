@@ -51,7 +51,9 @@ public interface Scoreboard {
     void finishMatch(String homeTeam, String awayTeam);
 
     /**
-     * Returns the matches currently in progress.
+     * Returns the matches currently in progress, ordered by total score (highest first). Matches
+     * with the same total score are ordered by start order, most recently started first; score
+     * updates do not affect this order.
      *
      * @return unmodifiable list of match snapshots
      */

@@ -4,7 +4,8 @@ import com.sportradar.scoreboard.exception.MatchAlreadyStartedException;
 import com.sportradar.scoreboard.exception.MatchNotFoundException;
 import com.sportradar.scoreboard.exception.TeamAlreadyPlayingException;
 
-import java.util.LinkedHashMap;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,12 @@ import java.util.Map;
  */
 public final class InMemoryScoreboard implements Scoreboard {
 
-    private final Map<MatchKey, Match> matches = new LinkedHashMap<>();
+    private static final Comparator<LiveMatch> SUMMARY_ORDER = Comparator
+            .comparingInt(LiveMatch::totalScore).reversed()
+            .thenComparing(Comparator.comparingLong(LiveMatch::startSequence).reversed());
+
+    private final Map<MatchKey, LiveMatch> matches = new HashMap<>();
+    private long nextStartSequence;
 
     @Override
     public Match startMatch(String homeTeam, String awayTeam) {
@@ -30,7 +36,7 @@ public final class InMemoryScoreboard implements Scoreboard {
         requireNotPlaying(away);
 
         Match match = new Match(home.display(), away.display(), 0, 0);
-        matches.put(key, match);
+        matches.put(key, new LiveMatch(match, nextStartSequence++));
         return match;
     }
 
@@ -43,11 +49,11 @@ public final class InMemoryScoreboard implements Scoreboard {
                     "Scores must not be negative: " + homeScore + " - " + awayScore);
         }
         MatchKey key = new MatchKey(home.key(), away.key());
-        Match current = matches.get(key);
+        LiveMatch current = matches.get(key);
         if (current == null) {
             throw new MatchNotFoundException(home.display(), away.display());
         }
-        matches.put(key, new Match(current.homeTeam(), current.awayTeam(), homeScore, awayScore));
+        matches.put(key, current.withScore(homeScore, awayScore));
     }
 
     @Override
@@ -61,7 +67,10 @@ public final class InMemoryScoreboard implements Scoreboard {
 
     @Override
     public List<Match> getSummary() {
-        return List.copyOf(matches.values());
+        return matches.values().stream()
+                .sorted(SUMMARY_ORDER)
+                .map(LiveMatch::match)
+                .toList();
     }
 
     private void requireNotPlaying(TeamName team) {
@@ -76,6 +85,19 @@ public final class InMemoryScoreboard implements Scoreboard {
 
         boolean involves(String teamKey) {
             return homeTeam.equals(teamKey) || awayTeam.equals(teamKey);
+        }
+    }
+
+    // A monotonic sequence rather than a timestamp, so tie-breaks are deterministic.
+    private record LiveMatch(Match match, long startSequence) {
+
+        LiveMatch withScore(int homeScore, int awayScore) {
+            return new LiveMatch(
+                    new Match(match.homeTeam(), match.awayTeam(), homeScore, awayScore), startSequence);
+        }
+
+        int totalScore() {
+            return match.homeScore() + match.awayScore();
         }
     }
 }

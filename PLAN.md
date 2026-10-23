@@ -66,16 +66,17 @@ Implementation:
 
 ## Step 5: Summary ordering (D15, D16)
 Tests first:
-- [ ] Ordered by total score, highest first
-- [ ] A tie goes to the match started most recently
-- [ ] A score update doesn't change the tie-break
-- [ ] The returned list can't be modified
-- [ ] Snapshots don't change: a summary taken before an update still shows the old score
-- [ ] Acceptance test with the example from the task description
+- [x] Ordered by total score, highest first
+- [x] A tie goes to the match started most recently
+- [x] A score update doesn't change the tie-break
+- [x] A rematch counts as most recently started: Mexico–Canada finished and restarted after Spain–Brazil comes first
+- [x] The returned list can't be modified
+- [x] Snapshots don't change: a summary taken before an update still shows the old score
+- [x] Acceptance test with the example from the task description
 
 Implementation:
-- [ ] Start sequence counter and comparator
-- [ ] Commit: *Order summary by total score and start order*
+- [x] Start sequence counter and comparator
+- [x] Commit: *Order summary by total score and start order*
 
 ## Step 6: Thread safety (D17)
 - [ ] Concurrency smoke test: many threads start, update and finish matches; afterwards no team is in two matches and the state is consistent

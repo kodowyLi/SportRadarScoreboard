@@ -10,6 +10,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -279,6 +281,104 @@ class InMemoryScoreboardTest {
 
             assertThat(scoreboard.getSummary())
                     .containsExactly(new Match("Poland", "Spain", 0, 0));
+        }
+    }
+
+    @Nested
+    class Summary {
+
+        @Test
+        void ordersByTotalScoreDescending() {
+            startWithScore("Mexico", "Canada", 0, 1);
+            startWithScore("Spain", "Brazil", 3, 2);
+            startWithScore("Germany", "France", 1, 1);
+
+            assertThat(scoreboard.getSummary()).containsExactly(
+                    new Match("Spain", "Brazil", 3, 2),
+                    new Match("Germany", "France", 1, 1),
+                    new Match("Mexico", "Canada", 0, 1));
+        }
+
+        @Test
+        void ordersTiesByMostRecentlyStartedFirst() {
+            startWithScore("Mexico", "Canada", 1, 1);
+            startWithScore("Spain", "Brazil", 2, 0);
+            startWithScore("Germany", "France", 0, 2);
+
+            assertThat(scoreboard.getSummary()).containsExactly(
+                    new Match("Germany", "France", 0, 2),
+                    new Match("Spain", "Brazil", 2, 0),
+                    new Match("Mexico", "Canada", 1, 1));
+        }
+
+        @Test
+        void scoreUpdateDoesNotChangeTieBreak() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.startMatch("Spain", "Brazil");
+            scoreboard.updateScore("Spain", "Brazil", 1, 1);
+
+            scoreboard.updateScore("Mexico", "Canada", 1, 1);
+
+            assertThat(scoreboard.getSummary()).containsExactly(
+                    new Match("Spain", "Brazil", 1, 1),
+                    new Match("Mexico", "Canada", 1, 1));
+        }
+
+        @Test
+        void rematchCountsAsMostRecentlyStarted() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.startMatch("Spain", "Brazil");
+            scoreboard.finishMatch("Mexico", "Canada");
+
+            scoreboard.startMatch("Mexico", "Canada");
+
+            assertThat(scoreboard.getSummary()).containsExactly(
+                    new Match("Mexico", "Canada", 0, 0),
+                    new Match("Spain", "Brazil", 0, 0));
+        }
+
+        @Test
+        void isUnmodifiable() {
+            scoreboard.startMatch("Mexico", "Canada");
+            List<Match> summary = scoreboard.getSummary();
+
+            assertThatThrownBy(() -> summary.add(new Match("Spain", "Brazil", 0, 0)))
+                    .isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(summary::clear)
+                    .isInstanceOf(UnsupportedOperationException.class);
+            assertThat(scoreboard.getSummary()).hasSize(1);
+        }
+
+        @Test
+        void isSnapshotNotAffectedByLaterChanges() {
+            scoreboard.startMatch("Mexico", "Canada");
+            List<Match> before = scoreboard.getSummary();
+
+            scoreboard.updateScore("Mexico", "Canada", 0, 5);
+            scoreboard.startMatch("Spain", "Brazil");
+
+            assertThat(before).containsExactly(new Match("Mexico", "Canada", 0, 0));
+        }
+
+        @Test
+        void matchesExampleFromTaskDescription() {
+            startWithScore("Mexico", "Canada", 0, 5);
+            startWithScore("Spain", "Brazil", 10, 2);
+            startWithScore("Germany", "France", 2, 2);
+            startWithScore("Uruguay", "Italy", 6, 6);
+            startWithScore("Argentina", "Australia", 3, 1);
+
+            assertThat(scoreboard.getSummary()).containsExactly(
+                    new Match("Uruguay", "Italy", 6, 6),
+                    new Match("Spain", "Brazil", 10, 2),
+                    new Match("Mexico", "Canada", 0, 5),
+                    new Match("Argentina", "Australia", 3, 1),
+                    new Match("Germany", "France", 2, 2));
+        }
+
+        private void startWithScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
+            scoreboard.startMatch(homeTeam, awayTeam);
+            scoreboard.updateScore(homeTeam, awayTeam, homeScore, awayScore);
         }
     }
 }
