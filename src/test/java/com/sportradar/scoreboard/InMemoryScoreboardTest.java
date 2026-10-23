@@ -1,0 +1,126 @@
+package com.sportradar.scoreboard;
+
+import com.sportradar.scoreboard.exception.MatchAlreadyStartedException;
+import com.sportradar.scoreboard.exception.TeamAlreadyPlayingException;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+class InMemoryScoreboardTest {
+
+    private final Scoreboard scoreboard = new InMemoryScoreboard();
+
+    @Nested
+    class StartMatch {
+
+        @Test
+        void returnsNewMatchWithZeroZeroScore() {
+            Match match = scoreboard.startMatch("Mexico", "Canada");
+
+            assertThat(match).isEqualTo(new Match("Mexico", "Canada", 0, 0));
+        }
+
+        @Test
+        void addsMatchToSummary() {
+            scoreboard.startMatch("Mexico", "Canada");
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Mexico", "Canada", 0, 0));
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" ", "\t"})
+        void rejectsMissingHomeTeam(String homeTeam) {
+            assertThatThrownBy(() -> scoreboard.startMatch(homeTeam, "Canada"))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" ", "\t"})
+        void rejectsMissingAwayTeam(String awayTeam) {
+            assertThatThrownBy(() -> scoreboard.startMatch("Mexico", awayTeam))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        void rejectsTeamPlayingItself() {
+            assertThatThrownBy(() -> scoreboard.startMatch("Spain", " spain "))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        void trimsTeamNames() {
+            Match match = scoreboard.startMatch("  Spain ", " Brazil  ");
+
+            assertThat(match).isEqualTo(new Match("Spain", "Brazil", 0, 0));
+        }
+
+        @Test
+        void rejectsSamePairingWhileInProgress() {
+            scoreboard.startMatch("Spain", "Brazil");
+
+            assertThatThrownBy(() -> scoreboard.startMatch("Spain", "Brazil"))
+                    .isInstanceOf(MatchAlreadyStartedException.class);
+        }
+
+        @Test
+        void comparesTeamNamesIgnoringCaseAndSurroundingWhitespace() {
+            scoreboard.startMatch("Spain", "Brazil");
+
+            assertThatThrownBy(() -> scoreboard.startMatch(" SPAIN", "brazil "))
+                    .isInstanceOf(MatchAlreadyStartedException.class);
+        }
+
+        @Test
+        void rejectsHomeTeamAlreadyPlayingInAnotherMatch() {
+            scoreboard.startMatch("Poland", "Brazil");
+
+            assertThatThrownBy(() -> scoreboard.startMatch("Poland", "Spain"))
+                    .isInstanceOf(TeamAlreadyPlayingException.class);
+        }
+
+        @Test
+        void rejectsAwayTeamAlreadyPlayingInAnotherMatch() {
+            scoreboard.startMatch("Poland", "Brazil");
+
+            assertThatThrownBy(() -> scoreboard.startMatch("Spain", "poland"))
+                    .isInstanceOf(TeamAlreadyPlayingException.class);
+        }
+
+        @Test
+        void rejectsReversedPairingWhileInProgress() {
+            scoreboard.startMatch("Spain", "Brazil");
+
+            assertThatThrownBy(() -> scoreboard.startMatch("Brazil", "Spain"))
+                    .isInstanceOf(TeamAlreadyPlayingException.class);
+        }
+
+        @Test
+        void rejectedStartLeavesScoreboardUnchanged() {
+            scoreboard.startMatch("Poland", "Brazil");
+
+            assertThatThrownBy(() -> scoreboard.startMatch("Spain", "Poland"))
+                    .isInstanceOf(TeamAlreadyPlayingException.class);
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Poland", "Brazil", 0, 0));
+        }
+
+        @Test
+        void distinguishesMatchesWhoseConcatenatedTeamNamesAreEqual() {
+            scoreboard.startMatch("AB", "CDE");
+            scoreboard.startMatch("ABC", "DE");
+
+            assertThat(scoreboard.getSummary()).containsExactlyInAnyOrder(
+                    new Match("AB", "CDE", 0, 0),
+                    new Match("ABC", "DE", 0, 0));
+        }
+    }
+}

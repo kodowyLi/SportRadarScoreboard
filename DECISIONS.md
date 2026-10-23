@@ -145,7 +145,7 @@ Invariants span multiple steps (team check + sequence + insert), so a single loc
 - B. In-memory behind a repository interface (swappable)
 
 Decision: A
-A repository interface would be premature for a simple library.
+A repository interface would be premature for a simple library. The public API is a `Scoreboard` interface with a `public final InMemoryScoreboard` implementation that owns the storage.
 
 ### D19. Which Java version and test stack?
 - A. Java 17 LTS
@@ -162,7 +162,7 @@ Java 21 LTS (records); JUnit 5 + AssertJ for clear list assertions.
 - D. Result objects
 
 Decision: A + B
-`IllegalArgumentException` for bad input; custom unchecked exceptions (`MatchNotFoundException`, `MatchAlreadyStartedException`) for state errors.
+`IllegalArgumentException` for bad input; custom unchecked exceptions (`MatchNotFoundException`, `MatchAlreadyStartedException`, `TeamAlreadyPlayingException`) for state errors.
 
 ### D21. How far beyond "simple" should the scope go?
 - A. Plain Java library, no frameworks, no persistence, no I/O

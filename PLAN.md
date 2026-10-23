@@ -16,21 +16,26 @@ Workflow for every step: write tests → run `mvn test` and see them fail for th
 
 ## Step 2: Start a match (D1–D6, D11, D14, D20)
 Tests first:
-- [ ] Starting a match returns a `Match` snapshot at 0–0
-- [ ] `getSummary()` includes the new match
-- [ ] Null or blank team name → `IllegalArgumentException`
-- [ ] A team playing itself → `IllegalArgumentException`
-- [ ] Names are trimmed and compared ignoring case
-- [ ] Starting the same pairing twice → `MatchAlreadyStartedException`
-- [ ] A team that is already playing → `TeamAlreadyPlayingException` (e.g. Poland–Brazil is live, so Spain–Poland is rejected)
-- [ ] Match keys don't collide: "AB" vs "CDE" and "ABC" vs "DE" are separate matches and both can start
+- [x] Starting a match returns a `Match` snapshot at 0–0
+- [x] `getSummary()` includes the new match
+- [x] Null or blank team name → `IllegalArgumentException`
+- [x] A team playing itself → `IllegalArgumentException`
+- [x] Names are stripped of surrounding (including Unicode) whitespace and compared ignoring case
+- [x] Starting the same pairing twice → `MatchAlreadyStartedException`
+- [x] A team that is already playing → `TeamAlreadyPlayingException` (e.g. Poland–Brazil is live, so Spain–Poland is rejected)
+- [x] Match keys don't collide: "AB" vs "CDE" and "ABC" vs "DE" are separate matches and both can start
+- [x] Reversed pairing while in progress (Brazil–Spain while Spain–Brazil is live) → `TeamAlreadyPlayingException`
+- [x] A rejected start leaves the scoreboard unchanged
+- [x] `Match.toString` → "Uruguay 6 - Italy 6" (`MatchTest`)
+- [x] `TeamNameTest`: Unicode whitespace, no-break spaces (U+00A0, U+2007, U+202F), ignore case, null/blank
 
 Implementation:
-- [ ] `Match` record (home, away, homeScore, awayScore), `toString` → "Uruguay 6 - Italy 6"
-- [ ] `Scoreboard.startMatch`, basic `getSummary`
-- [ ] `MatchAlreadyStartedException`, `TeamAlreadyPlayingException`
-- [ ] Add `TeamAlreadyPlayingException` to D20 in DECISIONS.md
-- [ ] Commit: *Add starting a match*
+- [x] `Match` record (home, away, homeScore, awayScore), `toString` → "Uruguay 6 - Italy 6"
+- [x] `Scoreboard` interface and `public final InMemoryScoreboard`: `startMatch`, basic `getSummary`
+- [x] `MatchAlreadyStartedException`, `TeamAlreadyPlayingException` in `com.sportradar.scoreboard.exception`
+- [x] Package-private `TeamName` record: the single place for validation and normalisation (strips Unicode whitespace incl. no-break spaces, `Locale.ROOT` lower case)
+- [x] Add `TeamAlreadyPlayingException` to D20 in DECISIONS.md
+- [x] Commit: *Add starting a match*
 
 ## Step 3: Update the score (D7–D10)
 Tests first:
