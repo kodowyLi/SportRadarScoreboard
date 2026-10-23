@@ -15,10 +15,7 @@ record TeamName(String display) {
     private static final Pattern CONTROL_CHARACTERS = Pattern.compile("\\p{Cc}");
 
     TeamName {
-        if (display == null) {
-            throw new IllegalArgumentException("Team name must not be null or blank");
-        }
-        String visible = FORMAT_CHARACTERS.matcher(display).replaceAll("");
+        String visible = FORMAT_CHARACTERS.matcher(display == null ? "" : display).replaceAll("");
         // Runs before the control character check, which would otherwise reject tabs and newlines.
         String singleSpaced = WHITESPACE.matcher(visible).replaceAll(" ").strip();
         if (CONTROL_CHARACTERS.matcher(singleSpaced).find()) {

@@ -60,7 +60,7 @@ class InMemoryScoreboardTest {
         }
 
         @Test
-        void trimsTeamNames() {
+        void stripsSurroundingWhitespaceFromTeamNames() {
             Match match = scoreboard.startMatch("  Spain ", " Brazil  ");
 
             assertThat(match).isEqualTo(new Match("Spain", "Brazil", 0, 0));

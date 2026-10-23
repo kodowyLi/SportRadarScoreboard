@@ -23,8 +23,17 @@ public final class InMemoryScoreboard implements Scoreboard {
             .comparingLong(LiveMatch::totalScore).reversed()
             .thenComparing(Comparator.comparingLong(LiveMatch::startSequence).reversed());
 
+    // Lookups by a single team scan all matches. With the handful of matches a tournament has in
+    // progress at once, that is cheaper than keeping a separate team index consistent.
     private final Map<MatchKey, LiveMatch> matches = new HashMap<>();
     private long nextStartSequence;
+
+    /**
+     * Creates an empty scoreboard.
+     */
+    public InMemoryScoreboard() {
+        // explicit only so that the public constructor is documented
+    }
 
     @Override
     public synchronized Match startMatch(String homeTeam, String awayTeam) {

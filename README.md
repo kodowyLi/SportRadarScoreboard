@@ -12,6 +12,8 @@ A small Java library that keeps track of football matches in progress and their 
 ./mvnw verify
 ```
 
+The build requires JDK 21 or newer (checked by the Maven Enforcer plugin). It compiles with all lint warnings enabled and treats warnings as errors, checks the Javadoc of the public API with doclint, runs all tests and writes a coverage report to `target/site/jacoco/index.html`.
+
 ## Usage
 
 ```java
