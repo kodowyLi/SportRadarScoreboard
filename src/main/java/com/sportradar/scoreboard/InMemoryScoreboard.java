@@ -20,7 +20,7 @@ import java.util.Optional;
 public final class InMemoryScoreboard implements Scoreboard {
 
     private static final Comparator<LiveMatch> SUMMARY_ORDER = Comparator
-            .comparingInt(LiveMatch::totalScore).reversed()
+            .comparingLong(LiveMatch::totalScore).reversed()
             .thenComparing(Comparator.comparingLong(LiveMatch::startSequence).reversed());
 
     private final Map<MatchKey, LiveMatch> matches = new HashMap<>();
@@ -110,8 +110,9 @@ public final class InMemoryScoreboard implements Scoreboard {
                     new Match(match.homeTeam(), match.awayTeam(), homeScore, awayScore), startSequence);
         }
 
-        int totalScore() {
-            return match.homeScore() + match.awayScore();
+        // long, so that two large int scores cannot overflow into a negative total
+        long totalScore() {
+            return (long) match.homeScore() + match.awayScore();
         }
     }
 }

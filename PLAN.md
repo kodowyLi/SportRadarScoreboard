@@ -72,6 +72,7 @@ Tests first:
 - [x] Ordered by total score, highest first
 - [x] A tie goes to the match started most recently
 - [x] A score update doesn't change the tie-break
+- [x] Totals beyond `int` range are ordered correctly (total computed as `long`, no overflow)
 - [x] A rematch counts as most recently started: Mexico–Canada finished and restarted after Spain–Brazil comes first
 - [x] The returned list can't be modified
 - [x] Snapshots don't change: a summary taken before an update still shows the old score

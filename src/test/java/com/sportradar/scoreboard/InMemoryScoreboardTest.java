@@ -349,6 +349,18 @@ class InMemoryScoreboardTest {
         }
 
         @Test
+        void ordersTotalsBeyondIntRangeCorrectly() {
+            startWithScore("Mexico", "Canada", 1, 0);
+            startWithScore("Spain", "Brazil", Integer.MAX_VALUE, 1);
+            startWithScore("Germany", "France", Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+            assertThat(scoreboard.getSummary()).containsExactly(
+                    new Match("Germany", "France", Integer.MAX_VALUE, Integer.MAX_VALUE),
+                    new Match("Spain", "Brazil", Integer.MAX_VALUE, 1),
+                    new Match("Mexico", "Canada", 1, 0));
+        }
+
+        @Test
         void rematchCountsAsMostRecentlyStarted() {
             scoreboard.startMatch("Mexico", "Canada");
             scoreboard.startMatch("Spain", "Brazil");
