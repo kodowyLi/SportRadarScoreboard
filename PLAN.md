@@ -93,15 +93,15 @@ Implementation:
 
 ## Step 8: Extra feature, `findMatchByTeam` (D22), in its own commit
 Tests first:
-- [ ] Finds a match whether the team is home or away
-- [ ] Ignores case and surrounding spaces
-- [ ] Returns empty for an unknown team or a finished match
-- [ ] Blank input → `IllegalArgumentException`
+- [x] Finds a match whether the team is home or away
+- [x] Ignores case and surrounding spaces
+- [x] Returns empty for an unknown team or a finished match
+- [x] Blank input → `IllegalArgumentException`
 
 Implementation:
-- [ ] `Optional<Match> findMatchByTeam(String team)`
-- [ ] README section: what the feature does and why it was chosen
-- [ ] Commit: *Add finding a match by team*
+- [x] `Optional<Match> findMatchByTeam(String team)`
+- [x] README section: what the feature does and why it was chosen
+- [x] Commit: *Add finding a match by team*
 
 ## Step 9: AI.md (D23)
 - [ ] Summary of how AI was used

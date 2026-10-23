@@ -48,8 +48,28 @@ All types live in `com.sportradar.scoreboard`; exceptions in `com.sportradar.sco
 | `void updateScore(home, away, homeScore, awayScore)` | Sets the absolute score | `IllegalArgumentException` (blank name, negative score), `MatchNotFoundException` |
 | `void finishMatch(home, away)` | Removes the match from the scoreboard | `IllegalArgumentException` (blank name), `MatchNotFoundException` |
 | `List<Match> getSummary()` | Matches in progress, highest total score first; ties: most recently started first | none |
+| `Optional<Match> findMatchByTeam(team)` | The match the team is playing in, home or away; empty if none ([extra feature](#extra-feature-find-a-match-by-team)) | `IllegalArgumentException` (blank name) |
 
 `Match` is an immutable record (`homeTeam`, `awayTeam`, `homeScore`, `awayScore`) whose `toString()` is `Uruguay 6 - Italy 6`. Invalid input throws `IllegalArgumentException`; the three custom exceptions are unchecked and extend `IllegalStateException`.
+
+## Extra feature: find a match by team
+
+```java
+// continuing the usage example above
+scoreboard.findMatchByTeam("brazil");  // Optional[Spain 10 - Brazil 2]
+scoreboard.findMatchByTeam("Italy");   // Optional.empty (match finished)
+```
+
+`findMatchByTeam` returns the match a team is currently playing in, whether at home or away, using the same name rules as the rest of the API (case and surrounding whitespace are ignored).
+
+**Why this feature:**
+
+- **It answers the most common question about a live scoreboard:** "how is my team doing?". Today a caller would have to fetch the whole summary and search it, and get the home/away and name-normalisation rules right themselves.
+- **It removes the need to know home vs. away.** `updateScore` and `finishMatch` need the exact home/away pair; `findMatchByTeam` lets a caller look that up from a single team name.
+- **It builds on an existing rule.** Because a team plays at most one match at a time, the result is a single optional match, not a list, so the API stays simple.
+- **It is small, read-only and low risk.** It adds no state and cannot break the scoreboard's invariants.
+
+Alternatives considered (a history of finished matches, a score-change listener, undo) were rejected because they either contradict a decision (finished matches are removed) or add far more state and complexity than a "simple library" needs. See D22 in [DECISIONS.md](DECISIONS.md).
 
 ## Assumptions
 

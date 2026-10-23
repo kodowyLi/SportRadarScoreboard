@@ -5,6 +5,7 @@ import com.sportradar.scoreboard.exception.MatchNotFoundException;
 import com.sportradar.scoreboard.exception.TeamAlreadyPlayingException;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Live football scoreboard that keeps track of matches in progress.
@@ -60,4 +61,14 @@ public interface Scoreboard {
      * @return unmodifiable list of match snapshots
      */
     List<Match> getSummary();
+
+    /**
+     * Finds the match in progress that the given team is playing in, either at home or away.
+     * Since a team plays at most one match at a time, there is at most one result.
+     *
+     * @param team team name
+     * @return snapshot of the team's match in progress, or empty if the team is not playing
+     * @throws IllegalArgumentException if the team name is null or blank
+     */
+    Optional<Match> findMatchByTeam(String team);
 }

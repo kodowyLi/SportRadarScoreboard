@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * {@link Scoreboard} that keeps all matches in memory.
@@ -75,6 +76,15 @@ public final class InMemoryScoreboard implements Scoreboard {
                 .sorted(SUMMARY_ORDER)
                 .map(LiveMatch::match)
                 .toList();
+    }
+
+    @Override
+    public synchronized Optional<Match> findMatchByTeam(String team) {
+        TeamName teamName = TeamName.of(team);
+        return matches.entrySet().stream()
+                .filter(entry -> entry.getKey().involves(teamName.key()))
+                .map(entry -> entry.getValue().match())
+                .findFirst();
     }
 
     private void requireNotPlaying(TeamName team) {

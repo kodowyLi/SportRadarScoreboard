@@ -389,4 +389,59 @@ class InMemoryScoreboardTest {
             scoreboard.updateScore(homeTeam, awayTeam, homeScore, awayScore);
         }
     }
+
+    @Nested
+    class FindMatchByTeam {
+
+        @Test
+        void findsMatchByHomeTeam() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.startMatch("Spain", "Brazil");
+            scoreboard.updateScore("Spain", "Brazil", 2, 1);
+
+            assertThat(scoreboard.findMatchByTeam("Spain"))
+                    .contains(new Match("Spain", "Brazil", 2, 1));
+        }
+
+        @Test
+        void findsMatchByAwayTeam() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.startMatch("Spain", "Brazil");
+            scoreboard.updateScore("Spain", "Brazil", 2, 1);
+
+            assertThat(scoreboard.findMatchByTeam("Brazil"))
+                    .contains(new Match("Spain", "Brazil", 2, 1));
+        }
+
+        @Test
+        void matchesTeamNameIgnoringCaseAndSurroundingWhitespace() {
+            scoreboard.startMatch("Poland", "Spain");
+
+            assertThat(scoreboard.findMatchByTeam(" sPAIN\u00A0"))
+                    .contains(new Match("Poland", "Spain", 0, 0));
+        }
+
+        @Test
+        void returnsEmptyForUnknownTeam() {
+            scoreboard.startMatch("Mexico", "Canada");
+
+            assertThat(scoreboard.findMatchByTeam("Spain")).isEmpty();
+        }
+
+        @Test
+        void returnsEmptyForTeamWhoseMatchIsFinished() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.finishMatch("Mexico", "Canada");
+
+            assertThat(scoreboard.findMatchByTeam("Mexico")).isEmpty();
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {" ", "\u00A0"})
+        void rejectsMissingTeamName(String team) {
+            assertThatThrownBy(() -> scoreboard.findMatchByTeam(team))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
 }
