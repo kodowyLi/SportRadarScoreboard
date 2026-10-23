@@ -2,7 +2,7 @@
 
 ## Summary
 
-The whole solution was built in one session with **Claude Code** (Anthropic's CLI agent, model Claude Opus 5.5), working directly in this repository. The AI read the task PDF, proposed decisions for the open questions, wrote the plan, the tests, the code and the documentation, and ran every build. I directed the work, made or approved every decision, reviewed each step and approved every commit.
+The whole solution was built with **Claude Code** (Anthropic's CLI agent, model Claude Opus 5.5), working directly in this repository. The AI read the task PDF, proposed decisions for the open questions, wrote the plan, the tests, the code and the documentation, and ran every build. I directed the work, made or approved every decision, reviewed each step and approved every commit.
 
 How the work was organised:
 
@@ -14,7 +14,7 @@ How the work was organised:
 
 ### Where human review mattered
 
-Several real bugs were found because I questioned the AI's output rather than accepting it:
+Several real bugs were found by reviewing the AI's output, including review in a separate Claude session, rather than accepting it:
 
 - A team already playing in a *different* match needed its own exception (`TeamAlreadyPlayingException`), not "match already started".
 - Match keys built by joining names could collide ("AB"/"CDE" vs "ABC"/"DE"); a test pins this.
