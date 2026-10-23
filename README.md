@@ -62,7 +62,7 @@ scoreboard.findMatchByTeam("brazil");  // Optional[Spain 10 - Brazil 2]
 scoreboard.findMatchByTeam("Italy");   // Optional.empty (match finished)
 ```
 
-`findMatchByTeam` returns the match a team is currently playing in, whether at home or away, using the same name rules as the rest of the API (case and surrounding whitespace are ignored).
+`findMatchByTeam` returns the match a team is currently playing in, whether at home or away, using the same name rules as the rest of the API (case, extra whitespace and invisible characters are ignored; see Assumptions).
 
 **Why this feature:**
 
@@ -90,7 +90,7 @@ The task leaves several questions open on purpose. Each one, with the options co
 ## Design and reasoning
 
 - **`Scoreboard` interface plus a `public final InMemoryScoreboard`.** Callers depend on the interface; the implementation owns its storage. A repository layer would be premature for a library this size.
-- **Immutable snapshots.** `startMatch` and `getSummary` return `Match` records and an unmodifiable list, so callers can never change the scoreboard's internal state, and a summary does not change after later updates.
+- **Immutable snapshots.** `startMatch`, `getSummary` and `findMatchByTeam` return `Match` records (the summary as an unmodifiable list), so callers can never change the scoreboard's internal state, and a summary does not change after later updates.
 - **Team-name handling in one place.** The package-private `TeamName` record validates and normalises names in its constructor, so a `TeamName` can't exist with an unchecked name; nothing else does this work.
 - **Structured keys.** Matches are keyed by a record holding both normalised names, never a joined string, so `"AB"`/`"CDE"` and `"ABC"`/`"DE"` can never collide.
 - **Start sequence instead of timestamps.** Each start takes the next value of a counter. Timestamps can be equal for two quick starts and make tests depend on a clock; a counter is deterministic.
@@ -108,7 +108,7 @@ The task leaves several questions open on purpose. Each one, with the options co
 
 `InMemoryScoreboard` is thread-safe: every public method is `synchronized`. Starting a match checks several things before inserting (pairing, both teams, start sequence), and these checks must be atomic together. Concurrent collections alone would not achieve that, so a lock is needed anyway. With a few matches and rare goals, contention on a single lock is negligible.
 
-Concurrency tests run many threads starting, updating and finishing matches at the same time. They are smoke tests: they reliably caught the races before synchronisation was added, but they cannot prove the absence of races.
+Concurrency tests run many threads starting, updating and finishing matches at the same time. They are smoke tests: before synchronisation was added they failed in every run they were tried in (3 of 3), but they cannot prove the absence of races.
 
 Known trade-offs and how to change them without touching the API:
 

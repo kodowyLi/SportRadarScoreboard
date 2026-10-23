@@ -4,7 +4,7 @@ Based on the task description and [DECISIONS.md](DECISIONS.md).
 
 Package: `com.sportradar.scoreboard`
 
-Workflow for every step: write tests → run `mvn test` and see them fail for the right reason → implement → `mvn verify` green → review diff → commit (only after approval). One commit per step.
+Workflow for every step: write tests → run `./mvnw test` and see them fail for the right reason → implement → `./mvnw verify` green → review diff → commit (only after approval). One commit per step.
 
 ## Step 1: Maven skeleton
 - [x] `pom.xml`: Java 21 (`maven.compiler.release`), UTF-8
@@ -109,5 +109,5 @@ Implementation:
 ## Step 9: AI.md (D23)
 - [ ] Summary of how AI was used
 - [ ] Full prompt history
-- [ ] Artifacts that guided the work (DECISIONS.md, PLAN.md)
+- [ ] Artifacts that guided the work (DECISIONS.md, PLAN.md, CLAUDE.md)
 - [ ] Commit: *Add AI.md*

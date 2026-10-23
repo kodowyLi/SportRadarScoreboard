@@ -17,7 +17,7 @@
 - Public API: Scoreboard interface, Match record, exceptions, and a public final
   implementation class.
 - Value types are immutable records; never return mutable internal state.
-- Team-name normalisation (collapse and strip whitespace, ignore case) lives in one place; never build keys by
-  joining strings.
+- Team-name normalisation (collapse and strip whitespace, ignore case) lives in one place;
+  never build keys by joining strings.
 - No repository/service layers.
 - Javadoc on public API only.

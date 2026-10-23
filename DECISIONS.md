@@ -27,7 +27,7 @@ A team cannot physically play two matches at once.
 
 ### D4. How are team names validated?
 - A. Reject null/blank names and a team playing itself
-- B. A, plus normalise names (trim, case-insensitive comparison)
+- B. A, plus normalise names (whitespace and Unicode normalisation, case-insensitive comparison)
 - C. No validation
 
 Decision: B
