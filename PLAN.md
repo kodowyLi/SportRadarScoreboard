@@ -7,11 +7,12 @@ Package: `com.sportradar.scoreboard`
 Workflow for every step: write tests → run `mvn test` and see them fail for the right reason → implement → `mvn verify` green → review diff → commit (only after approval). One commit per step.
 
 ## Step 1: Maven skeleton
-- [ ] `pom.xml`: Java 21 (`maven.compiler.release`), UTF-8
-- [ ] JUnit Jupiter 5 and AssertJ (test scope)
-- [ ] Pinned `maven-compiler-plugin` and `maven-surefire-plugin` versions
-- [ ] `mvn verify` builds with no sources
-- [ ] Commit: *Add Maven project skeleton*
+- [x] `pom.xml`: Java 21 (`maven.compiler.release`), UTF-8
+- [x] JUnit Jupiter 5 and AssertJ (test scope)
+- [x] Pinned `maven-compiler-plugin` and `maven-surefire-plugin` versions
+- [x] Maven wrapper (`mvnw`, Maven 3.9.9) so the build doesn't depend on a local Maven install
+- [x] `./mvnw verify` builds with no sources
+- [x] Commit: *Add Maven project skeleton*
 
 ## Step 2: Start a match (D1–D6, D11, D14, D20)
 Tests first:
