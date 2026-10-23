@@ -99,6 +99,14 @@ class InMemoryScoreboardTest {
         }
 
         @Test
+        void treatsWhitespaceVariantsInsideNameAsSameTeam() {
+            scoreboard.startMatch("Costa\u00A0Rica", "Mexico");
+
+            assertThatThrownBy(() -> scoreboard.startMatch("Costa Rica", "Canada"))
+                    .isInstanceOf(TeamAlreadyPlayingException.class);
+        }
+
+        @Test
         void rejectsReversedPairingWhileInProgress() {
             scoreboard.startMatch("Spain", "Brazil");
 

@@ -3,8 +3,8 @@ package com.sportradar.scoreboard;
 /**
  * Immutable snapshot of a match on the scoreboard.
  *
- * @param homeTeam  home team name, as given when the match was started, without surrounding whitespace
- * @param awayTeam  away team name, as given when the match was started, without surrounding whitespace
+ * @param homeTeam  home team name, as given when the match was started, with whitespace normalised
+ * @param awayTeam  away team name, as given when the match was started, with whitespace normalised
  * @param homeScore goals scored by the home team
  * @param awayScore goals scored by the away team
  */

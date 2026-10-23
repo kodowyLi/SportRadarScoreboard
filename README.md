@@ -58,7 +58,7 @@ The task leaves several questions open on purpose. Each one, with the options co
 - **A new match starts at 0–0.** Scores come in through updates, as in the example.
 - **A match is identified by its home/away pair.** Home and away are not interchangeable: Spain–Poland does not find Poland–Spain.
 - **A team plays at most one match at a time.** Starting a match for a team that is already playing is rejected, as is starting the same pairing twice.
-- **Team names are normalised.** Surrounding whitespace is stripped (including Unicode and no-break spaces) and comparison ignores case, so `" spain"` and `"SPAIN "` are the same team. The spelling used when the match was started is the one shown.
+- **Team names are normalised.** Surrounding whitespace is stripped, any whitespace inside a name becomes a single space (including Unicode and no-break spaces), and comparison ignores case. So `" spain"` and `"SPAIN "` are the same team, and so are `"Costa\u00A0Rica"` and `"Costa  Rica"`. The spelling used when the match was started is the one shown.
 - **Scores are absolute, not increments.** This matches "updated with these scores" and makes corrections natural.
 - **Scores may go down** (VAR decisions, feed corrections), **but never below zero.**
 - **Finished matches are removed.** This is a live scoreboard; history is out of scope. Both teams are free to play again, including a rematch.

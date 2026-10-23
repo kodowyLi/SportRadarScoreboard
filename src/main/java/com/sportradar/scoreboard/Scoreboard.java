@@ -9,8 +9,10 @@ import java.util.List;
 /**
  * Live football scoreboard that keeps track of matches in progress.
  * <p>
- * Team names are stripped of surrounding whitespace and compared ignoring case, so {@code "Spain"} and {@code " spain "}
- * refer to the same team. A team can take part in at most one match in progress at a time.
+ * Team names are normalised: surrounding whitespace is removed, any whitespace inside a name
+ * becomes a single space, and names are compared ignoring case. So {@code "Costa Rica"},
+ * {@code " costa  RICA "} and a name using a no-break space all refer to the same team.
+ * A team can take part in at most one match in progress at a time.
  */
 public interface Scoreboard {
 

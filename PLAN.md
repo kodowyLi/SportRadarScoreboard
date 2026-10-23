@@ -21,6 +21,7 @@ Tests first:
 - [x] Null or blank team name → `IllegalArgumentException`
 - [x] A team playing itself → `IllegalArgumentException`
 - [x] Names are stripped of surrounding (including Unicode) whitespace and compared ignoring case
+- [x] Whitespace inside a name collapses to a single space: "Costa\u00A0Rica" and "Costa  Rica" are the same team, shown as "Costa Rica"
 - [x] Starting the same pairing twice → `MatchAlreadyStartedException`
 - [x] A team that is already playing → `TeamAlreadyPlayingException` (e.g. Poland–Brazil is live, so Spain–Poland is rejected)
 - [x] Match keys don't collide: "AB" vs "CDE" and "ABC" vs "DE" are separate matches and both can start
@@ -33,7 +34,7 @@ Implementation:
 - [x] `Match` record (home, away, homeScore, awayScore), `toString` → "Uruguay 6 - Italy 6"
 - [x] `Scoreboard` interface and `public final InMemoryScoreboard`: `startMatch`, basic `getSummary`
 - [x] `MatchAlreadyStartedException`, `TeamAlreadyPlayingException` in `com.sportradar.scoreboard.exception`
-- [x] Package-private `TeamName` record: the single place for validation and normalisation (strips Unicode whitespace incl. no-break spaces, `Locale.ROOT` lower case)
+- [x] Package-private `TeamName` record: the single place for validation and normalisation (collapses Unicode whitespace incl. no-break spaces to single spaces and strips the ends, `Locale.ROOT` lower case)
 - [x] Add `TeamAlreadyPlayingException` to D20 in DECISIONS.md
 - [x] Commit: *Add starting a match*
 

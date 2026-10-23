@@ -32,11 +32,17 @@ class TeamNameTest {
         assertThat(team.display()).isEqualTo("Spain");
     }
 
-    @Test
-    void keepsWhitespaceInsideName() {
-        TeamName team = TeamName.of(" Costa\u00A0Rica ");
+    @ParameterizedTest
+    @ValueSource(strings = {"Costa\u00A0Rica", "Costa  Rica", "Costa\tRica", " Costa\u2003 \u202FRica "})
+    void collapsesWhitespaceInsideNameToSingleSpace(String rawName) {
+        TeamName team = TeamName.of(rawName);
 
-        assertThat(team.display()).isEqualTo("Costa\u00A0Rica");
+        assertThat(team.display()).isEqualTo("Costa Rica");
+    }
+
+    @Test
+    void sameTeamRegardlessOfWhitespaceInsideName() {
+        assertThat(TeamName.of("Costa\u00A0Rica").sameTeamAs(TeamName.of("costa  RICA"))).isTrue();
     }
 
     @Test
