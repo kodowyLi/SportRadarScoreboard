@@ -28,9 +28,9 @@ public final class InMemoryScoreboard implements Scoreboard {
 
     @Override
     public synchronized Match startMatch(String homeTeam, String awayTeam) {
-        TeamName home = TeamName.of(homeTeam);
-        TeamName away = TeamName.of(awayTeam);
-        if (home.sameTeamAs(away)) {
+        TeamName home = new TeamName(homeTeam);
+        TeamName away = new TeamName(awayTeam);
+        if (home.equals(away)) {
             throw new IllegalArgumentException("A team cannot play against itself: " + home.display());
         }
         MatchKey key = new MatchKey(home.key(), away.key());
@@ -47,8 +47,8 @@ public final class InMemoryScoreboard implements Scoreboard {
 
     @Override
     public synchronized void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
-        TeamName home = TeamName.of(homeTeam);
-        TeamName away = TeamName.of(awayTeam);
+        TeamName home = new TeamName(homeTeam);
+        TeamName away = new TeamName(awayTeam);
         if (homeScore < 0 || awayScore < 0) {
             throw new IllegalArgumentException(
                     "Scores must not be negative: " + homeScore + " - " + awayScore);
@@ -63,8 +63,8 @@ public final class InMemoryScoreboard implements Scoreboard {
 
     @Override
     public synchronized void finishMatch(String homeTeam, String awayTeam) {
-        TeamName home = TeamName.of(homeTeam);
-        TeamName away = TeamName.of(awayTeam);
+        TeamName home = new TeamName(homeTeam);
+        TeamName away = new TeamName(awayTeam);
         if (matches.remove(new MatchKey(home.key(), away.key())) == null) {
             throw new MatchNotFoundException(home.display(), away.display());
         }
@@ -80,15 +80,16 @@ public final class InMemoryScoreboard implements Scoreboard {
 
     @Override
     public synchronized Optional<Match> findMatchByTeam(String team) {
-        TeamName teamName = TeamName.of(team);
+        String teamKey = new TeamName(team).key();
         return matches.entrySet().stream()
-                .filter(entry -> entry.getKey().involves(teamName.key()))
+                .filter(entry -> entry.getKey().involves(teamKey))
                 .map(entry -> entry.getValue().match())
                 .findFirst();
     }
 
     private void requireNotPlaying(TeamName team) {
-        boolean playing = matches.keySet().stream().anyMatch(key -> key.involves(team.key()));
+        String teamKey = team.key();
+        boolean playing = matches.keySet().stream().anyMatch(key -> key.involves(teamKey));
         if (playing) {
             throw new TeamAlreadyPlayingException(team.display());
         }

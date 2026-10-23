@@ -89,7 +89,7 @@ The task leaves several questions open on purpose. Each one, with the options co
 
 - **`Scoreboard` interface plus a `public final InMemoryScoreboard`.** Callers depend on the interface; the implementation owns its storage. A repository layer would be premature for a library this size.
 - **Immutable snapshots.** `startMatch` and `getSummary` return `Match` records and an unmodifiable list, so callers can never change the scoreboard's internal state, and a summary does not change after later updates.
-- **Team-name handling in one place.** The package-private `TeamName` record validates and normalises names; nothing else does.
+- **Team-name handling in one place.** The package-private `TeamName` record validates and normalises names in its constructor, so a `TeamName` can't exist with an unchecked name; nothing else does this work.
 - **Structured keys.** Matches are keyed by a record holding both normalised names, never a joined string, so `"AB"`/`"CDE"` and `"ABC"`/`"DE"` can never collide.
 - **Start sequence instead of timestamps.** Each start takes the next value of a counter. Timestamps can be equal for two quick starts and make tests depend on a clock; a counter is deterministic.
 - **Sort on read.** `getSummary` sorts the matches in progress on each call. With the handful of matches a World Cup has at once, this is cheaper and simpler than keeping a sorted structure up to date on every update.

@@ -12,14 +12,14 @@ class TeamNameTest {
 
     @Test
     void stripsSurroundingWhitespaceForDisplay() {
-        TeamName team = TeamName.of("  Spain\t");
+        TeamName team = new TeamName("  Spain\t");
 
         assertThat(team.display()).isEqualTo("Spain");
     }
 
     @Test
     void stripsUnicodeWhitespace() {
-        TeamName team = TeamName.of("\u2003Spain\u3000");
+        TeamName team = new TeamName("\u2003Spain\u3000");
 
         assertThat(team.display()).isEqualTo("Spain");
     }
@@ -27,7 +27,7 @@ class TeamNameTest {
     @ParameterizedTest
     @ValueSource(strings = {"Spain\u00A0", "\u00A0Spain", "\u2007Spain\u202F", "\u00A0 Spain \u00A0"})
     void stripsNonBreakingSpaces(String rawName) {
-        TeamName team = TeamName.of(rawName);
+        TeamName team = new TeamName(rawName);
 
         assertThat(team.display()).isEqualTo("Spain");
     }
@@ -35,72 +35,89 @@ class TeamNameTest {
     @ParameterizedTest
     @ValueSource(strings = {"Costa\u00A0Rica", "Costa  Rica", "Costa\tRica", " Costa\u2003 \u202FRica "})
     void collapsesWhitespaceInsideNameToSingleSpace(String rawName) {
-        TeamName team = TeamName.of(rawName);
+        TeamName team = new TeamName(rawName);
 
         assertThat(team.display()).isEqualTo("Costa Rica");
     }
 
     @Test
-    void sameTeamRegardlessOfWhitespaceInsideName() {
-        assertThat(TeamName.of("Costa\u00A0Rica").sameTeamAs(TeamName.of("costa  RICA"))).isTrue();
+    void equalRegardlessOfWhitespaceInsideName() {
+        assertThat(new TeamName("Costa\u00A0Rica")).isEqualTo(new TeamName("costa  RICA"));
     }
 
     @Test
     void composedAndDecomposedAccentsAreSameTeam() {
-        TeamName composed = TeamName.of("Cura\u00E7ao");
-        TeamName decomposed = TeamName.of("Curac\u0327ao");
+        TeamName composed = new TeamName("Cura\u00E7ao");
+        TeamName decomposed = new TeamName("Curac\u0327ao");
 
-        assertThat(decomposed.sameTeamAs(composed)).isTrue();
+        assertThat(decomposed).isEqualTo(composed);
         assertThat(decomposed.display()).isEqualTo("Cura\u00E7ao");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"Spain\u200B", "\uFEFFSpain", "Sp\u00ADain", "\u200ESpain\u200D"})
     void removesInvisibleFormatCharacters(String rawName) {
-        TeamName team = TeamName.of(rawName);
+        TeamName team = new TeamName(rawName);
 
         assertThat(team.display()).isEqualTo("Spain");
     }
 
     @Test
     void removesFormatCharacterBetweenWords() {
-        assertThat(TeamName.of("Costa\u200B Rica").display()).isEqualTo("Costa Rica");
+        assertThat(new TeamName("Costa\u200B Rica").display()).isEqualTo("Costa Rica");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"\u0000", "Spa\u0000in", "Spain\u0007", "\u007FSpain", "Spain\u0085"})
     void rejectsControlCharacters(String rawName) {
-        assertThatThrownBy(() -> TeamName.of(rawName))
+        assertThatThrownBy(() -> new TeamName(rawName))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
+    void constructorAlwaysNormalises() {
+        TeamName team = new TeamName("\u200B SPAIN\u00A0 ");
+
+        assertThat(team.display()).isEqualTo("SPAIN");
+        assertThat(team.key()).isEqualTo("spain");
+    }
+
+    @Test
     void keepsOriginalCaseForDisplay() {
-        TeamName team = TeamName.of("SPAIN");
+        TeamName team = new TeamName("SPAIN");
 
         assertThat(team.display()).isEqualTo("SPAIN");
     }
 
     @Test
     void keyIgnoresCase() {
-        assertThat(TeamName.of("SPAIN").key()).isEqualTo(TeamName.of("spain").key());
+        assertThat(new TeamName("SPAIN").key()).isEqualTo(new TeamName("spain").key());
     }
 
     @Test
-    void sameTeamIgnoringCaseAndWhitespace() {
-        assertThat(TeamName.of("Spain").sameTeamAs(TeamName.of("\u2003sPaIn "))).isTrue();
+    void equalIgnoringCase() {
+        TeamName spain = new TeamName("Spain");
+        TeamName lowerCase = new TeamName("spain");
+
+        assertThat(lowerCase).isEqualTo(spain);
+        assertThat(lowerCase.hashCode()).isEqualTo(spain.hashCode());
     }
 
     @Test
-    void differentTeams() {
-        assertThat(TeamName.of("Spain").sameTeamAs(TeamName.of("Brazil"))).isFalse();
+    void equalIgnoringCaseAndWhitespace() {
+        assertThat(new TeamName("\u2003sPaIn ")).isEqualTo(new TeamName("Spain"));
+    }
+
+    @Test
+    void differentTeamsAreNotEqual() {
+        assertThat(new TeamName("Spain")).isNotEqualTo(new TeamName("Brazil"));
     }
 
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "\t", "\u2003", "\u3000 \n", "\u00A0", "\u2007\u202F", "\u200B", "\uFEFF \u200D"})
     void rejectsNullAndBlankNames(String rawName) {
-        assertThatThrownBy(() -> TeamName.of(rawName))
+        assertThatThrownBy(() -> new TeamName(rawName))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
