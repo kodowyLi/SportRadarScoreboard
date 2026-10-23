@@ -123,3 +123,4 @@ Known trade-offs and how to change them without touching the API:
 - [DECISIONS.md](DECISIONS.md): open questions from the task, options considered, decisions and reasoning
 - [PLAN.md](PLAN.md): the step-by-step, test-first implementation plan
 - [CLAUDE.md](CLAUDE.md): project rules followed by the AI assistant
+- [AI.md](AI.md): how AI was used, the full prompt history and the artifacts that guided the work

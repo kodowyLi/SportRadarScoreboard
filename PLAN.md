@@ -107,7 +107,7 @@ Implementation:
 - [x] Commit: *Add finding a match by team*
 
 ## Step 9: AI.md (D23)
-- [ ] Summary of how AI was used
-- [ ] Full prompt history
-- [ ] Artifacts that guided the work (DECISIONS.md, PLAN.md, CLAUDE.md)
-- [ ] Commit: *Add AI.md*
+- [x] Summary of how AI was used
+- [x] Full prompt history
+- [x] Artifacts that guided the work (DECISIONS.md, PLAN.md, CLAUDE.md)
+- [x] Commit: *Add AI.md*
