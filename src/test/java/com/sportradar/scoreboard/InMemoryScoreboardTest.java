@@ -1,10 +1,12 @@
 package com.sportradar.scoreboard;
 
 import com.sportradar.scoreboard.exception.MatchAlreadyStartedException;
+import com.sportradar.scoreboard.exception.MatchNotFoundException;
 import com.sportradar.scoreboard.exception.TeamAlreadyPlayingException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -121,6 +123,64 @@ class InMemoryScoreboardTest {
             assertThat(scoreboard.getSummary()).containsExactlyInAnyOrder(
                     new Match("AB", "CDE", 0, 0),
                     new Match("ABC", "DE", 0, 0));
+        }
+    }
+
+    @Nested
+    class UpdateScore {
+
+        @Test
+        void setsAbsoluteScore() {
+            scoreboard.startMatch("Mexico", "Canada");
+
+            scoreboard.updateScore("Mexico", "Canada", 0, 5);
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Mexico", "Canada", 0, 5));
+        }
+
+        @Test
+        void allowsLoweringScore() {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.updateScore("Mexico", "Canada", 2, 5);
+
+            scoreboard.updateScore("Mexico", "Canada", 1, 4);
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Mexico", "Canada", 1, 4));
+        }
+
+        @ParameterizedTest
+        @CsvSource({"-1, 0", "0, -1", "-1, -1"})
+        void rejectsNegativeScore(int homeScore, int awayScore) {
+            scoreboard.startMatch("Mexico", "Canada");
+            scoreboard.updateScore("Mexico", "Canada", 1, 1);
+
+            assertThatThrownBy(() -> scoreboard.updateScore("Mexico", "Canada", homeScore, awayScore))
+                    .isInstanceOf(IllegalArgumentException.class);
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Mexico", "Canada", 1, 1));
+        }
+
+        @Test
+        void rejectsUnknownMatch() {
+            scoreboard.startMatch("Mexico", "Canada");
+
+            assertThatThrownBy(() -> scoreboard.updateScore("Spain", "Brazil", 1, 0))
+                    .isInstanceOf(MatchNotFoundException.class);
+        }
+
+        @Test
+        void rejectsSwappedTeams() {
+            scoreboard.startMatch("Poland", "Spain");
+            scoreboard.updateScore("Poland", "Spain", 2, 1);
+
+            assertThatThrownBy(() -> scoreboard.updateScore("Spain", "Poland", 1, 2))
+                    .isInstanceOf(MatchNotFoundException.class);
+
+            assertThat(scoreboard.getSummary())
+                    .containsExactly(new Match("Poland", "Spain", 2, 1));
         }
     }
 }

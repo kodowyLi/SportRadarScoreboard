@@ -39,16 +39,16 @@ Implementation:
 
 ## Step 3: Update the score (D7–D10)
 Tests first:
-- [ ] An absolute update is reflected in the summary
-- [ ] A lower score is allowed
-- [ ] Negative score → `IllegalArgumentException`
-- [ ] Unknown match → `MatchNotFoundException`
-- [ ] Home and away are kept apart: if Poland–Spain is live, `updateScore("Spain", "Poland", …)` → `MatchNotFoundException`, and the live match is unchanged
+- [x] An absolute update is reflected in the summary
+- [x] A lower score is allowed
+- [x] Negative score → `IllegalArgumentException`
+- [x] Unknown match → `MatchNotFoundException`
+- [x] Home and away are kept apart: if Poland–Spain is live, `updateScore("Spain", "Poland", …)` → `MatchNotFoundException`, and the live match is unchanged
 
 Implementation:
-- [ ] `updateScore(home, away, homeScore, awayScore)`
-- [ ] `MatchNotFoundException`
-- [ ] Commit: *Add updating the score*
+- [x] `updateScore(home, away, homeScore, awayScore)`
+- [x] `MatchNotFoundException`
+- [x] Commit: *Add updating the score*
 
 ## Step 4: Finish a match (D5, D12, D13)
 Tests first:

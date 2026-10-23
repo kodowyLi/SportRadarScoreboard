@@ -1,6 +1,7 @@
 package com.sportradar.scoreboard;
 
 import com.sportradar.scoreboard.exception.MatchAlreadyStartedException;
+import com.sportradar.scoreboard.exception.MatchNotFoundException;
 import com.sportradar.scoreboard.exception.TeamAlreadyPlayingException;
 
 import java.util.LinkedHashMap;
@@ -31,6 +32,22 @@ public final class InMemoryScoreboard implements Scoreboard {
         Match match = new Match(home.display(), away.display(), 0, 0);
         matches.put(key, match);
         return match;
+    }
+
+    @Override
+    public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
+        TeamName home = TeamName.of(homeTeam);
+        TeamName away = TeamName.of(awayTeam);
+        if (homeScore < 0 || awayScore < 0) {
+            throw new IllegalArgumentException(
+                    "Scores must not be negative: " + homeScore + " - " + awayScore);
+        }
+        MatchKey key = new MatchKey(home.key(), away.key());
+        Match current = matches.get(key);
+        if (current == null) {
+            throw new MatchNotFoundException(home.display(), away.display());
+        }
+        matches.put(key, new Match(current.homeTeam(), current.awayTeam(), homeScore, awayScore));
     }
 
     @Override

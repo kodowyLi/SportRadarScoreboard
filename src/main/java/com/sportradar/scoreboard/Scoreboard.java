@@ -1,6 +1,7 @@
 package com.sportradar.scoreboard;
 
 import com.sportradar.scoreboard.exception.MatchAlreadyStartedException;
+import com.sportradar.scoreboard.exception.MatchNotFoundException;
 import com.sportradar.scoreboard.exception.TeamAlreadyPlayingException;
 
 import java.util.List;
@@ -24,6 +25,19 @@ public interface Scoreboard {
      * @throws TeamAlreadyPlayingException  if either team is already playing in another match
      */
     Match startMatch(String homeTeam, String awayTeam);
+
+    /**
+     * Replaces the score of a match in progress with the given absolute score. A lower score than
+     * the current one is accepted, e.g. to apply a correction.
+     *
+     * @param homeTeam  home team of the match
+     * @param awayTeam  away team of the match
+     * @param homeScore new home team score
+     * @param awayScore new away team score
+     * @throws IllegalArgumentException if a team name is null or blank, or a score is negative
+     * @throws MatchNotFoundException   if no match with this home/away pairing is in progress
+     */
+    void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore);
 
     /**
      * Returns the matches currently in progress.
