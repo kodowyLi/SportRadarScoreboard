@@ -10,6 +10,21 @@ package com.sportradar.scoreboard;
  */
 public record Match(String homeTeam, String awayTeam, int homeScore, int awayScore) {
 
+    /**
+     * Creates a match snapshot.
+     *
+     * @throws IllegalArgumentException if a team name is null or blank, or a score is negative
+     */
+    public Match {
+        if (homeTeam == null || homeTeam.isBlank() || awayTeam == null || awayTeam.isBlank()) {
+            throw new IllegalArgumentException("Team names must not be null or blank");
+        }
+        if (homeScore < 0 || awayScore < 0) {
+            throw new IllegalArgumentException(
+                    "Scores must not be negative: " + homeScore + " - " + awayScore);
+        }
+    }
+
     @Override
     public String toString() {
         return homeTeam + " " + homeScore + " - " + awayTeam + " " + awayScore;
