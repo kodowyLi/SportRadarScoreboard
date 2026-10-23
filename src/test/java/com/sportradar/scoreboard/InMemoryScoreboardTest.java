@@ -75,6 +75,18 @@ class InMemoryScoreboardTest {
         }
 
         @Test
+        void matchAlreadyStartedExceptionNamesTheTeams() {
+            scoreboard.startMatch("Spain", "Brazil");
+
+            assertThatThrownBy(() -> scoreboard.startMatch(" Spain", "Brazil "))
+                    .hasMessage("Match already in progress: Spain - Brazil")
+                    .isInstanceOfSatisfying(MatchAlreadyStartedException.class, e -> {
+                        assertThat(e.getHomeTeam()).isEqualTo("Spain");
+                        assertThat(e.getAwayTeam()).isEqualTo("Brazil");
+                    });
+        }
+
+        @Test
         void comparesTeamNamesIgnoringCaseAndSurroundingWhitespace() {
             scoreboard.startMatch("Spain", "Brazil");
 
@@ -88,6 +100,16 @@ class InMemoryScoreboardTest {
 
             assertThatThrownBy(() -> scoreboard.startMatch("Poland", "Spain"))
                     .isInstanceOf(TeamAlreadyPlayingException.class);
+        }
+
+        @Test
+        void teamAlreadyPlayingExceptionNamesTheTeam() {
+            scoreboard.startMatch("Poland", "Brazil");
+
+            assertThatThrownBy(() -> scoreboard.startMatch("Spain", "Poland"))
+                    .hasMessage("Team is already playing in another match: Poland")
+                    .isInstanceOfSatisfying(TeamAlreadyPlayingException.class,
+                            e -> assertThat(e.getTeam()).isEqualTo("Poland"));
         }
 
         @Test
@@ -195,6 +217,16 @@ class InMemoryScoreboardTest {
 
             assertThatThrownBy(() -> scoreboard.updateScore("Spain", "Brazil", 1, 0))
                     .isInstanceOf(MatchNotFoundException.class);
+        }
+
+        @Test
+        void matchNotFoundExceptionNamesTheTeams() {
+            assertThatThrownBy(() -> scoreboard.updateScore("Spain", "Brazil", 1, 0))
+                    .hasMessage("No match in progress: Spain - Brazil")
+                    .isInstanceOfSatisfying(MatchNotFoundException.class, e -> {
+                        assertThat(e.getHomeTeam()).isEqualTo("Spain");
+                        assertThat(e.getAwayTeam()).isEqualTo("Brazil");
+                    });
         }
 
         @ParameterizedTest

@@ -50,7 +50,7 @@ All types live in `com.sportradar.scoreboard`; exceptions in `com.sportradar.sco
 | `List<Match> getSummary()` | Matches in progress, highest total score first; ties: most recently started first | none |
 | `Optional<Match> findMatchByTeam(team)` | The match the team is playing in, home or away; empty if none ([extra feature](#extra-feature-find-a-match-by-team)) | `IllegalArgumentException` (blank name) |
 
-`Match` is an immutable record (`homeTeam`, `awayTeam`, `homeScore`, `awayScore`) whose `toString()` is `Uruguay 6 - Italy 6`. Its constructor rejects null or blank team names and negative scores, so a `Match` is always valid. Invalid input throws `IllegalArgumentException`; the three custom exceptions are unchecked and extend `IllegalStateException`.
+`Match` is an immutable record (`homeTeam`, `awayTeam`, `homeScore`, `awayScore`) whose `toString()` is `Uruguay 6 - Italy 6`. Its constructor rejects null or blank team names and negative scores, so a `Match` is always valid. Invalid input throws `IllegalArgumentException`; the three custom exceptions are unchecked, extend `IllegalStateException`, and expose the teams involved (`getHomeTeam()`/`getAwayTeam()`, or `getTeam()` for `TeamAlreadyPlayingException`).
 
 ## Extra feature: find a match by team
 
