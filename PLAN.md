@@ -79,9 +79,9 @@ Implementation:
 - [x] Commit: *Order summary by total score and start order*
 
 ## Step 6: Thread safety (D17)
-- [ ] Concurrency smoke test: many threads start, update and finish matches; afterwards no team is in two matches and the state is consistent
-- [ ] `synchronized` public methods; thread safety documented in class Javadoc
-- [ ] Commit: *Make Scoreboard thread-safe*
+- [x] Concurrency smoke test: many threads start, update and finish matches; afterwards no team is in two matches and the state is consistent
+- [x] `synchronized` public methods; thread safety documented in class Javadoc
+- [x] Commit: *Make Scoreboard thread-safe*
 
 ## Step 7: README.md
 - [ ] Usage example

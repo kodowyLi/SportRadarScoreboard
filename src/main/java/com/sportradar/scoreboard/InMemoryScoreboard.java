@@ -11,6 +11,10 @@ import java.util.Map;
 
 /**
  * {@link Scoreboard} that keeps all matches in memory.
+ * <p>
+ * This class is thread-safe: every public method is {@code synchronized} on the instance, so
+ * each operation is atomic, including the checks performed before a match is started, and
+ * {@link #getSummary()} always reflects a single consistent state.
  */
 public final class InMemoryScoreboard implements Scoreboard {
 
@@ -22,7 +26,7 @@ public final class InMemoryScoreboard implements Scoreboard {
     private long nextStartSequence;
 
     @Override
-    public Match startMatch(String homeTeam, String awayTeam) {
+    public synchronized Match startMatch(String homeTeam, String awayTeam) {
         TeamName home = TeamName.of(homeTeam);
         TeamName away = TeamName.of(awayTeam);
         if (home.sameTeamAs(away)) {
@@ -41,7 +45,7 @@ public final class InMemoryScoreboard implements Scoreboard {
     }
 
     @Override
-    public void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
+    public synchronized void updateScore(String homeTeam, String awayTeam, int homeScore, int awayScore) {
         TeamName home = TeamName.of(homeTeam);
         TeamName away = TeamName.of(awayTeam);
         if (homeScore < 0 || awayScore < 0) {
@@ -57,7 +61,7 @@ public final class InMemoryScoreboard implements Scoreboard {
     }
 
     @Override
-    public void finishMatch(String homeTeam, String awayTeam) {
+    public synchronized void finishMatch(String homeTeam, String awayTeam) {
         TeamName home = TeamName.of(homeTeam);
         TeamName away = TeamName.of(awayTeam);
         if (matches.remove(new MatchKey(home.key(), away.key())) == null) {
@@ -66,7 +70,7 @@ public final class InMemoryScoreboard implements Scoreboard {
     }
 
     @Override
-    public List<Match> getSummary() {
+    public synchronized List<Match> getSummary() {
         return matches.values().stream()
                 .sorted(SUMMARY_ORDER)
                 .map(LiveMatch::match)
